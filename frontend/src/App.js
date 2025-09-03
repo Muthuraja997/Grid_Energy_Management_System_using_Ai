@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './App.css';
 
 const initialState = {
@@ -34,6 +34,38 @@ function App() {
   const [inputs, setInputs] = useState(initialState);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Calculate total load demand based on MCB power values
+  useEffect(() => {
+    // Sum up all MCB power values
+    let totalLoad = 0;
+    let criticalLoad = 0;
+    let nonCriticalLoad = 0;
+    
+    for (let i = 1; i <= 8; i++) {
+      const mcbPower = inputs[`MCB_${i}_Power(kW)`];
+      totalLoad += mcbPower;
+      
+      // First 3 MCBs are considered critical (as per the project logic)
+      if (i <= 3) {
+        criticalLoad += mcbPower;
+      } else {
+        nonCriticalLoad += mcbPower;
+      }
+    }
+    
+    // Update the load values
+    setInputs(prev => ({
+      ...prev,
+      "Total_Load_Demand(kW)": parseFloat(totalLoad.toFixed(2)),
+      "Critical_Load(kW)": parseFloat(criticalLoad.toFixed(2)),
+      "Non_Critical_Load(kW)": parseFloat(nonCriticalLoad.toFixed(2))
+    }));
+  }, [
+    inputs["MCB_1_Power(kW)"], inputs["MCB_2_Power(kW)"], inputs["MCB_3_Power(kW)"], 
+    inputs["MCB_4_Power(kW)"], inputs["MCB_5_Power(kW)"], inputs["MCB_6_Power(kW)"], 
+    inputs["MCB_7_Power(kW)"], inputs["MCB_8_Power(kW)"]
+  ]);
 
   const handleChange = (e) => {
     setInputs({ ...inputs, [e.target.name]: Number(e.target.value) });
@@ -118,18 +150,18 @@ function App() {
           </div>
           
           <div className="form-section">
-            <h3>Load Information</h3>
+            <h3>Load Information (Auto-Calculated)</h3>
             <div className="form-group">
               <label>Total Load Demand (kW)</label>
-              <input type="number" name="Total_Load_Demand(kW)" value={inputs["Total_Load_Demand(kW)"]} onChange={handleChange} step="any" min="0" required />
+              <input type="number" name="Total_Load_Demand(kW)" value={inputs["Total_Load_Demand(kW)"]} readOnly className="readonly-input" />
             </div>
             <div className="form-group">
               <label>Critical Load (kW)</label>
-              <input type="number" name="Critical_Load(kW)" value={inputs["Critical_Load(kW)"]} onChange={handleChange} step="any" min="0" required />
+              <input type="number" name="Critical_Load(kW)" value={inputs["Critical_Load(kW)"]} readOnly className="readonly-input" />
             </div>
             <div className="form-group">
               <label>Non-Critical Load (kW)</label>
-              <input type="number" name="Non_Critical_Load(kW)" value={inputs["Non_Critical_Load(kW)"]} onChange={handleChange} step="any" min="0" required />
+              <input type="number" name="Non_Critical_Load(kW)" value={inputs["Non_Critical_Load(kW)"]} readOnly className="readonly-input" />
             </div>
           </div>
           

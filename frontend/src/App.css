@@ -291,3 +291,11 @@ p {
     width: 100%;
   }
 }
+
+/* Add styling for read-only inputs */
+.readonly-input {
+  background-color: #f5f7fa !important;
+  color: #7f8c8d !important;
+  cursor: not-allowed !important;
+  border: 1px solid #dce4ec !important;
+}
