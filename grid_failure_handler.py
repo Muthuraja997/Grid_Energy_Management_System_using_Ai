@@ -34,8 +34,7 @@ def simulate_grid_failure(solar, wind, dg, ups, battery, total_demand, mcb_power
             for mcb_id, power in mcb_powers.items():
                 # Extract MCB number and priority
                 mcb_num = int(mcb_id.split('_')[1])
-                priority_key = f"MCB_{mcb_num}_Priority"
-                priority = int(mcb_num) # Default priority is the MCB number
+                priority = mcb_num  # Default priority is the MCB number
                 mcb_priorities.append((mcb_id, power, priority, mcb_num))
             
             # Sort by priority (lower number = higher priority)
@@ -56,9 +55,17 @@ def simulate_grid_failure(solar, wind, dg, ups, battery, total_demand, mcb_power
                 "optimal_source": "Grid_Power(kW)",
                 "total_available_power": grid_power,
                 "mcb_statuses": mcb_statuses,
+                "mcb_powers": mcb_powers,  # Include the original MCB powers
                 "remaining_power": remaining_power,
                 "demand_exceeds_supply": True,
-                "total_demand": total_mcb_load
+                "total_demand": total_mcb_load,
+                "source_consumption": {
+                    "Solar_Power": solar,
+                    "Wind_Power": wind,
+                    "DG_Power": dg,
+                    "UPS_Power": ups,
+                    "Grid_Power": grid_power
+                }
             }
         else:
             # When grid is active and has enough power, all MCBs should remain ON
@@ -69,9 +76,17 @@ def simulate_grid_failure(solar, wind, dg, ups, battery, total_demand, mcb_power
                 "optimal_source": "Grid_Power(kW)",
                 "total_available_power": grid_power,
                 "mcb_statuses": mcb_statuses,
+                "mcb_powers": mcb_powers,  # Include the original MCB powers
                 "remaining_power": remaining_power,
                 "demand_exceeds_supply": False,
-                "total_demand": total_mcb_load
+                "total_demand": total_mcb_load,
+                "source_consumption": {
+                    "Solar_Power": solar,
+                    "Wind_Power": wind,
+                    "DG_Power": dg,
+                    "UPS_Power": ups,
+                    "Grid_Power": grid_power
+                }
             }
     
     # If grid has failed, use alternative sources
@@ -94,14 +109,13 @@ def simulate_grid_failure(solar, wind, dg, ups, battery, total_demand, mcb_power
     mcb_statuses = {}
     remaining_power = total_available_power
     
-    # Sort MCBs by priority (MCB_1, MCB_2, MCB_3 are critical and get higher priority)
+    # Prepare MCB priorities - use MCB numbers for sorting
+    # Lower MCB numbers are considered higher priority
     mcb_priorities = []
     for mcb_id, power in mcb_powers.items():
-        # Extract MCB number and determine if it's critical
         mcb_num = int(mcb_id.split('_')[1])
-        is_critical = mcb_num <= 3  # First 3 MCBs are considered critical
-        priority = mcb_num if is_critical else mcb_num + 5  # Critical loads have higher priority (lower number)
-        mcb_priorities.append((mcb_id, power, priority))
+        # Use MCB number directly for priority - lower numbers are higher priority
+        mcb_priorities.append((mcb_id, power, mcb_num))
     
     # Sort by priority (lower number = higher priority)
     mcb_priorities.sort(key=lambda x: x[2])
@@ -118,7 +132,15 @@ def simulate_grid_failure(solar, wind, dg, ups, battery, total_demand, mcb_power
         "optimal_source": best_source[0],
         "total_available_power": total_available_power,
         "mcb_statuses": mcb_statuses,
+        "mcb_powers": mcb_powers,  # Include the original MCB powers
         "remaining_power": remaining_power,
         "demand_exceeds_supply": demand_exceeds_supply,
-        "total_demand": total_mcb_load
+        "total_demand": total_mcb_load,
+        "source_consumption": {
+            "Solar_Power": available_sources.get("Solar_Power(kW)", 0),
+            "Wind_Power": available_sources.get("Wind_Power(kW)", 0),
+            "DG_Power": available_sources.get("DG_Power(kW)", 0),
+            "UPS_Power": available_sources.get("UPS_Power(kW)", 0),
+            "Grid_Power": 0  # Grid is down in this scenario
+        }
     }

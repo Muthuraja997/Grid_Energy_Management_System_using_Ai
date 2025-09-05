@@ -1,0 +1,207 @@
+/* Fullscreen styling for Energy Management System */
+
+body {
+  background: linear-gradient(120deg, #2980b9 0%, #6dd5fa 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Override container to be fullscreen */
+.container {
+  max-width: 100%;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  box-shadow: none;
+  border-radius: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Make all content within container fit in the center area */
+.container > * {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Dashboard specific styling */
+.dashboard-container {
+  margin: 0;
+  padding: 15px;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.page-navigation {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Make charts container responsive */
+.dashboard-charts {
+  width: 100%;
+}
+
+.charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.charts-container > div {
+  flex: 0 1 400px;
+  max-width: 450px;
+  min-width: 300px;
+}
+
+/* Dashboard specific styles */
+.result-section {
+  background-color: #f9f9f9;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.power-management-results {
+  margin-bottom: 30px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dashboard-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* MCB status table improvements */
+.mcb-status-table {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+}
+
+.mcb-status-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  background-color: #3498db;
+  color: #fff;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+}
+
+.mcb-status-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.mcb-status-row.on {
+  background-color: #f1f9f1;
+}
+
+.mcb-status-row.off {
+  background-color: #fdf3f2;
+  color: #7f8c8d;
+}
+
+/* History section styling */
+.history-section {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.history-table th {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.history-table td {
+  padding: 10px 15px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.history-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.history-table tr:hover {
+  background-color: #f1f8ff;
+}
+
+/* Sample visualization styling */
+.sample-visualization {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sample-visualization h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+/* Navigation buttons */
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 20px;
+}

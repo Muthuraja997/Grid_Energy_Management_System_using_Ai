@@ -1,37 +1,65 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import './App.css';
+import './fullscreen.css'; // Import the fullscreen styles
+import './buttons.css'; // Import the button styles
+
+// Import page components
+import InputDetailsPage from "./pages/InputDetailsPage";
+import ConfigurationPage from "./pages/ConfigurationPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const initialState = {
-  "Solar_Power(kW)": 25,
-  "Wind_Power(kW)": 15,
-  "DG_Power(kW)": 10,
-  "UPS_Power(kW)": 5,
+  "powerSources": [
+    { id: "Grid_Power", name: "Grid Power", value: 100, unit: "kW", isFixed: true },
+    { id: "Solar_Power", name: "Solar Power", value: 25, unit: "kW", isFixed: false },
+    { id: "Wind_Power", name: "Wind Power", value: 15, unit: "kW", isFixed: false },
+    { id: "DG_Power", name: "DG Power", value: 10, unit: "kW", isFixed: false },
+    { id: "UPS_Power", name: "UPS Power", value: 5, unit: "kW", isFixed: false }
+  ],
   "Battery_Percentage(%)": 75,
   "Total_Load_Demand(kW)": 50,
   "Critical_Load(kW)": 25,
   "Non_Critical_Load(kW)": 25,
   "Grid_Status": 1,
-  "Grid_Power(kW)": 100,
-  "MCB_1_Power(kW)": 8,
-  "MCB_1_Priority": 1,
-  "MCB_2_Power(kW)": 7,
-  "MCB_2_Priority": 2,
-  "MCB_3_Power(kW)": 6,
-  "MCB_3_Priority": 3,
-  "MCB_4_Power(kW)": 5,
-  "MCB_4_Priority": 7,
-  "MCB_5_Power(kW)": 5,
-  "MCB_5_Priority": 8,
-  "MCB_6_Power(kW)": 4,
-  "MCB_6_Priority": 9,
-  "MCB_7_Power(kW)": 3,
-  "MCB_7_Priority": 10,
-  "MCB_8_Power(kW)": 2,
-  "MCB_8_Priority": 11
+  "mcbs": [
+    { id: 1, power: 8, priority: 1, isCritical: true },
+    { id: 2, power: 7, priority: 2, isCritical: true },
+    { id: 3, power: 6, priority: 3, isCritical: true },
+    { id: 4, power: 5, priority: 7, isCritical: false },
+    { id: 5, power: 5, priority: 8, isCritical: false },
+    { id: 6, power: 4, priority: 9, isCritical: false },
+    { id: 7, power: 3, priority: 10, isCritical: false },
+    { id: 8, power: 2, priority: 11, isCritical: false }
+  ]
+};
+
+// Convert back to old format for API compatibility
+const convertToApiFormat = (state) => {
+  const apiFormat = {
+    "Grid_Status": state.Grid_Status,
+    "Battery_Percentage(%)": state["Battery_Percentage(%)"],
+    "Total_Load_Demand(kW)": state["Total_Load_Demand(kW)"],
+    "Critical_Load(kW)": state["Critical_Load(kW)"],
+    "Non_Critical_Load(kW)": state["Non_Critical_Load(kW)"]
+  };
+  
+  // Add power sources
+  state.powerSources.forEach(source => {
+    apiFormat[`${source.id}(kW)`] = source.value;
+  });
+  
+  // Add MCBs
+  state.mcbs.forEach(mcb => {
+    apiFormat[`MCB_${mcb.id}_Power(kW)`] = mcb.power;
+    apiFormat[`MCB_${mcb.id}_Priority`] = mcb.priority;
+  });
+  
+  return apiFormat;
 };
 
 function App() {
-  const [inputs, setInputs] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,43 +70,111 @@ function App() {
     let criticalLoad = 0;
     let nonCriticalLoad = 0;
     
-    for (let i = 1; i <= 8; i++) {
-      const mcbPower = inputs[`MCB_${i}_Power(kW)`];
-      totalLoad += mcbPower;
+    state.mcbs.forEach(mcb => {
+      totalLoad += mcb.power;
       
-      // First 3 MCBs are considered critical (as per the project logic)
-      if (i <= 3) {
-        criticalLoad += mcbPower;
+      if (mcb.isCritical) {
+        criticalLoad += mcb.power;
       } else {
-        nonCriticalLoad += mcbPower;
+        nonCriticalLoad += mcb.power;
       }
-    }
+    });
     
     // Update the load values
-    setInputs(prev => ({
+    setState(prev => ({
       ...prev,
       "Total_Load_Demand(kW)": parseFloat(totalLoad.toFixed(2)),
       "Critical_Load(kW)": parseFloat(criticalLoad.toFixed(2)),
       "Non_Critical_Load(kW)": parseFloat(nonCriticalLoad.toFixed(2))
     }));
-  }, [
-    inputs["MCB_1_Power(kW)"], inputs["MCB_2_Power(kW)"], inputs["MCB_3_Power(kW)"], 
-    inputs["MCB_4_Power(kW)"], inputs["MCB_5_Power(kW)"], inputs["MCB_6_Power(kW)"], 
-    inputs["MCB_7_Power(kW)"], inputs["MCB_8_Power(kW)"]
-  ]);
+  }, [state.mcbs]);
 
-  const handleChange = (e) => {
-    setInputs({ ...inputs, [e.target.name]: Number(e.target.value) });
+  // Handlers for dynamic updates
+  const handlePowerSourceChange = (id, value) => {
+    setState(prev => ({
+      ...prev,
+      powerSources: prev.powerSources.map(source => 
+        source.id === id ? { ...source, value: Number(value) } : source
+      )
+    }));
+  };
+
+  const handleMcbChange = (id, field, value) => {
+    setState(prev => ({
+      ...prev,
+      mcbs: prev.mcbs.map(mcb => 
+        mcb.id === id ? { ...mcb, [field]: Number(value) } : mcb
+      )
+    }));
+  };
+
+  const addPowerSource = (newSource) => {
+    setState(prev => ({
+      ...prev,
+      powerSources: [...prev.powerSources, { 
+        id: newSource.id,
+        name: newSource.name,
+        value: newSource.value || 0,
+        unit: newSource.unit || "kW",
+        isFixed: false
+      }]
+    }));
+  };
+
+  const removePowerSource = (id) => {
+    setState(prev => ({
+      ...prev,
+      powerSources: prev.powerSources.filter(source => source.id !== id)
+    }));
+  };
+
+  const addMcb = () => {
+    const newId = Math.max(...state.mcbs.map(mcb => mcb.id), 0) + 1;
+    const isCritical = newId <= 3; // First 3 are critical by default
+    
+    setState(prev => ({
+      ...prev,
+      mcbs: [...prev.mcbs, { 
+        id: newId, 
+        power: 0, 
+        priority: prev.mcbs.length + 1,
+        isCritical
+      }]
+    }));
+  };
+
+  const removeMcb = (id) => {
+    setState(prev => ({
+      ...prev,
+      mcbs: prev.mcbs.filter(mcb => mcb.id !== id)
+    }));
+  };
+
+  const handleGridStatusChange = (status) => {
+    setState(prev => ({
+      ...prev,
+      Grid_Status: Number(status)
+    }));
+  };
+
+  const handleBatteryPercentageChange = (value) => {
+    setState(prev => ({
+      ...prev,
+      "Battery_Percentage(%)": Number(value)
+    }));
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     try {
+      // Convert state to format expected by API
+      const apiData = convertToApiFormat(state);
+      
       const res = await fetch("http://localhost:5000/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inputs)
+        body: JSON.stringify(apiData)
       });
       
       if (!res.ok) {
@@ -96,178 +192,46 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <h1>Energy Management System</h1>
-      <div className="grid-status">
-        <h2>Grid Status: 
-          <select 
-            name="Grid_Status" 
-            value={inputs["Grid_Status"]} 
-            onChange={(e) => setInputs({...inputs, "Grid_Status": Number(e.target.value)})}>
-            <option value={1}>Active</option>
-            <option value={0}>Failure</option>
-          </select>
-        </h2>
+    <Router>
+      <div className="app-container">
+        <Routes>
+          <Route 
+            path="/" 
+            element={<InputDetailsPage 
+              state={state}
+              powerSources={state.powerSources}
+              batteryPercentage={state["Battery_Percentage(%)"]}
+              gridStatus={state.Grid_Status}
+              handlePowerSourceChange={handlePowerSourceChange}
+              handleBatteryPercentageChange={handleBatteryPercentageChange}
+              handleGridStatusChange={handleGridStatusChange}
+              addPowerSource={addPowerSource}
+              removePowerSource={removePowerSource}
+            />} 
+          />
+          <Route 
+            path="/configuration" 
+            element={<ConfigurationPage 
+              mcbs={state.mcbs}
+              handleMcbChange={handleMcbChange}
+              addMcb={addMcb}
+              removeMcb={removeMcb}
+            />} 
+          />
+          <Route 
+            path="/dashboard" 
+            element={<DashboardPage 
+              state={state}
+              result={result} 
+              handleSubmit={handleSubmit} 
+              loading={loading} 
+            />} 
+          />
+          {/* Redirect any unknown routes to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
-      
-      <form onSubmit={handleSubmit} className="input-form">
-        <div className="form-sections">
-          <div className="form-section">
-            <h3>Power Sources</h3>
-            <div className="form-group">
-              <label>Grid Power (kW)</label>
-              <input 
-                type="number" 
-                name="Grid_Power(kW)" 
-                value={inputs["Grid_Power(kW)"]} 
-                onChange={handleChange} 
-                step="any" 
-                min="0" 
-                required 
-                disabled={inputs["Grid_Status"] === 0}
-              />
-            </div>
-            <div className="form-group">
-              <label>Solar Power (kW)</label>
-              <input type="number" name="Solar_Power(kW)" value={inputs["Solar_Power(kW)"]} onChange={handleChange} step="any" min="0" required />
-            </div>
-            <div className="form-group">
-              <label>Wind Power (kW)</label>
-              <input type="number" name="Wind_Power(kW)" value={inputs["Wind_Power(kW)"]} onChange={handleChange} step="any" min="0" required />
-            </div>
-            <div className="form-group">
-              <label>DG Power (kW)</label>
-              <input type="number" name="DG_Power(kW)" value={inputs["DG_Power(kW)"]} onChange={handleChange} step="any" min="0" required />
-            </div>
-            <div className="form-group">
-              <label>UPS Power (kW)</label>
-              <input type="number" name="UPS_Power(kW)" value={inputs["UPS_Power(kW)"]} onChange={handleChange} step="any" min="0" required />
-            </div>
-            <div className="form-group">
-              <label>Battery Percentage (%)</label>
-              <input type="number" name="Battery_Percentage(%)" value={inputs["Battery_Percentage(%)"]} onChange={handleChange} min="0" max="100" required />
-            </div>
-          </div>
-          
-          <div className="form-section">
-            <h3>Load Information (Auto-Calculated)</h3>
-            <div className="form-group">
-              <label>Total Load Demand (kW)</label>
-              <input type="number" name="Total_Load_Demand(kW)" value={inputs["Total_Load_Demand(kW)"]} readOnly className="readonly-input" />
-            </div>
-            <div className="form-group">
-              <label>Critical Load (kW)</label>
-              <input type="number" name="Critical_Load(kW)" value={inputs["Critical_Load(kW)"]} readOnly className="readonly-input" />
-            </div>
-            <div className="form-group">
-              <label>Non-Critical Load (kW)</label>
-              <input type="number" name="Non_Critical_Load(kW)" value={inputs["Non_Critical_Load(kW)"]} readOnly className="readonly-input" />
-            </div>
-          </div>
-          
-          <div className="form-section">
-            <h3>MCB Information</h3>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(mcb => (
-              <div className="mcb-group" key={mcb}>
-                <label>MCB {mcb} ({mcb <= 3 ? "Critical" : "Non-Critical"})</label>
-                <div className="mcb-inputs">
-                  <div className="form-group">
-                    <label>Power (kW)</label>
-                    <input 
-                      type="number" 
-                      name={`MCB_${mcb}_Power(kW)`} 
-                      value={inputs[`MCB_${mcb}_Power(kW)`]} 
-                      onChange={handleChange} 
-                      step="any" 
-                      min="0" 
-                      required 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Priority</label>
-                    <input 
-                      type="number" 
-                      name={`MCB_${mcb}_Priority`} 
-                      value={inputs[`MCB_${mcb}_Priority`]} 
-                      onChange={handleChange} 
-                      min="1" 
-                      required 
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        <button type="submit" disabled={loading}>
-          {loading ? "Calculating..." : "Calculate Optimal Configuration"}
-        </button>
-      </form>
-      {result && (
-        <div className="result">
-          <h2>Prediction Results</h2>
-          <div className="result-section">
-            <h3>Load Priority: {Math.round(result.priority * 100)}%</h3>
-            <h3>Optimal Source: {result.optimal_source.replace(/_Power\(kW\)/, '')}</h3>
-            <h3>Grid Status: {result.grid_status}</h3>
-          </div>
-          
-          <div className="power-management-results">
-            <h3>Power Management</h3>
-            
-            {result.power_management.demand_exceeds_supply && (
-              <div className="power-warning">
-                <h4>Warning: Demand Exceeds Available Supply</h4>
-                <p>Total Demand: {result.power_management.total_demand.toFixed(2)} kW</p>
-                <p>Available Power: {result.power_management.total_available_power.toFixed(2)} kW</p>
-                <p>Shortage: {(result.power_management.total_demand - result.power_management.total_available_power).toFixed(2)} kW</p>
-                <p className="warning-message">Non-critical MCBs will be turned off based on priority</p>
-              </div>
-            )}
-            
-            <p>
-              <span>Best Available Source:</span> 
-              <strong>{result.power_management.optimal_source.replace(/_Power\(kW\)/, '')}</strong>
-            </p>
-            <p>
-              <span>Total Available Power:</span> 
-              <strong>{result.power_management.total_available_power.toFixed(2)} kW</strong>
-            </p>
-            <p>
-              <span>Remaining Power:</span> 
-              <strong>{result.power_management.remaining_power.toFixed(2)} kW</strong>
-            </p>
-            
-            <h4>MCB Status Recommendations</h4>
-            <div className="mcb-status-table">
-              <div className="mcb-status-header">
-                <div>MCB</div>
-                <div>Status</div>
-                <div>Power (kW)</div>
-                <div>Priority</div>
-              </div>
-              {Object.entries(result.power_management.mcb_statuses).sort((a, b) => {
-                // Sort by MCB number
-                const numA = parseInt(a[0].split('_')[1]);
-                const numB = parseInt(b[0].split('_')[1]);
-                return numA - numB;
-              }).map(([mcb, status]) => {
-                const mcbNum = mcb.split('_')[1];
-                return (
-                  <div className={`mcb-status-row ${status === 1 ? 'on' : 'off'}`} key={mcb}>
-                    <div>{mcb}</div>
-                    <div>{status === 1 ? 'ON' : 'OFF'}</div>
-                    <div>{inputs[`${mcb}_Power(kW)`]} kW</div>
-                    <div>{inputs[`${mcb}_Priority`]}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </Router>
   );
 }
 

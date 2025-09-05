@@ -1,0 +1,88 @@
+/* Button styling */
+.calculate-button, 
+.edit-inputs-button, 
+.back-button {
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.calculate-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.calculate-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.edit-inputs-button {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.edit-inputs-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.back-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.back-button:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Warning and error message styling */
+.power-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #856404;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #721c24;
+  text-align: center;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+  .charts-container > div {
+    flex: 1 1 100%;
+  }
+  
+  .mcb-status-table {
+    font-size: 0.9rem;
+  }
+  
+  .container {
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+}

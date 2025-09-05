@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Energy Management System - Workflow Diagram</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(120deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2 {
+            color: #2980b9;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        
+        .diagram {
+            width: 100%;
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+        
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .system-overview {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .component {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .frontend {
+            border-color: #3498db;
+            background: #ebf5fb;
+        }
+        
+        .backend {
+            border-color: #2ecc71;
+            background: #eafaf1;
+        }
+        
+        .database {
+            border-color: #f39c12;
+            background: #fef9e7;
+        }
+        
+        .component h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .component-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .component-content {
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        .arrow {
+            position: relative;
+            width: 150px;
+            height: 30px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .arrow::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #7f8c8d;
+        }
+        
+        .arrow::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #7f8c8d;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+        
+        .arrow-text {
+            background: white;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            z-index: 2;
+        }
+        
+        .arrow-bidirectional::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #7f8c8d;
+        }
+        
+        .arrow-bidirectional::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #7f8c8d;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+        
+        .arrow-bidirectional::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-right: 8px solid #7f8c8d;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+        
+        .detailed-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .flow-step {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .flow-input {
+            border-color: #3498db;
+            background: #ebf5fb;
+        }
+        
+        .flow-process {
+            border-color: #2ecc71;
+            background: #eafaf1;
+        }
+        
+        .flow-decision {
+            border-color: #e74c3c;
+            background: #fdedec;
+            position: relative;
+            width: 200px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(45deg);
+            margin: 50px 0;
+        }
+        
+        .flow-decision-text {
+            transform: rotate(-45deg);
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .flow-output {
+            border-color: #9b59b6;
+            background: #f4ecf7;
+        }
+        
+        .arrow-left {
+            transform: rotate(90deg);
+            margin: 40px 0 0 -120px;
+        }
+        
+        .arrow-right {
+            transform: rotate(-90deg);
+            margin: 40px -120px 0 0;
+        }
+        
+        .process-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .process-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        
+        .architecture-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            width: 100%;
+        }
+        
+        .arch-layer {
+            display: flex;
+            width: 80%;
+            max-width: 800px;
+            margin-bottom: 15px;
+        }
+        
+        .arch-component {
+            flex: 1;
+            margin: 0 10px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .presentation-layer {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .business-layer {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .data-layer {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 15px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grid Energy Management System using AI</h1>
+        <h2>System Architecture Diagram</h2>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #3498db;"></div>
+                <span>Frontend Components</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #2ecc71;"></div>
+                <span>Backend Components</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f39c12;"></div>
+                <span>Data/Models</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e74c3c;"></div>
+                <span>Decision Points</span>
+            </div>
+        </div>
+        
+        <div class="diagram">
+            <div class="system-overview">
+                <div class="component frontend">
+                    <div class="component-title">Frontend (React.js)</div>
+                    <div class="component-content">
+                        <ul>
+                            <li>Input Details Page</li>
+                            <li>Configuration Page</li>
+                            <li>Dashboard Page</li>
+                            <li>Visualization Components</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="component backend">
+                    <div class="component-title">Backend (Flask)</div>
+                    <div class="component-content">
+                        <ul>
+                            <li>API Endpoints</li>
+                            <li>Data Processing</li>
+                            <li>Grid Failure Handler</li>
+                            <li>Power Optimization</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="component database">
+                    <div class="component-title">AI Models</div>
+                    <div class="component-content">
+                        <ul>
+                            <li>Priority Regression Model</li>
+                            <li>Source Classification Model</li>
+                            <li>Energy Dataset</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h2>Detailed Workflow Diagram</h2>
+        
+        <div class="diagram">
+            <div class="workflow">
+                <!-- User Input Section -->
+                <div class="flow-step flow-input">
+                    <strong>User Input</strong>
+                    <p>User enters power source data (Grid, Solar, Wind, DG, UPS), battery percentage, and configures MCBs</p>
+                </div>
+                
+                <div class="arrow">
+                    <span class="arrow-text">HTTP Request</span>
+                </div>
+                
+                <!-- API Processing -->
+                <div class="flow-step flow-process">
+                    <strong>Backend API Processing</strong>
+                    <p>Flask backend receives data and preprocesses it for model input</p>
+                </div>
+                
+                <div class="arrow">
+                    <span class="arrow-text">Data Transformation</span>
+                </div>
+                
+                <!-- AI Model Prediction -->
+                <div class="flow-step flow-process">
+                    <strong>AI Model Prediction</strong>
+                    <p>Models predict priority levels and optimal power source</p>
+                </div>
+                
+                <div class="arrow">
+                    <span class="arrow-text">Model Output</span>
+                </div>
+                
+                <!-- Grid Status Decision -->
+                <div class="flow-decision">
+                    <div class="flow-decision-text">Grid Status Check</div>
+                </div>
+                
+                <!-- Grid Active Branch -->
+                <div style="display: flex; width: 100%; justify-content: space-around;">
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 45%;">
+                        <div class="arrow">
+                            <span class="arrow-text">Grid Active (1)</span>
+                        </div>
+                        
+                        <div class="flow-step flow-process">
+                            <strong>Normal Operation</strong>
+                            <p>Prioritize Grid Power and distribute to all MCBs</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 45%;">
+                        <div class="arrow">
+                            <span class="arrow-text">Grid Failure (0)</span>
+                        </div>
+                        
+                        <div class="flow-step flow-process">
+                            <strong>Grid Failure Handling</strong>
+                            <p>Select alternative sources and prioritize critical MCBs</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Merge branches -->
+                <div class="arrow" style="margin-top: 50px;">
+                    <span class="arrow-text">Power Management</span>
+                </div>
+                
+                <!-- MCB Status Calculation -->
+                <div class="flow-step flow-process">
+                    <strong>MCB Status Calculation</strong>
+                    <p>Determine which MCBs should be ON/OFF based on available power and priority</p>
+                </div>
+                
+                <div class="arrow">
+                    <span class="arrow-text">Response Generation</span>
+                </div>
+                
+                <!-- API Response -->
+                <div class="flow-step flow-output">
+                    <strong>API Response</strong>
+                    <p>Return optimal configuration, MCB statuses, and power management details</p>
+                </div>
+                
+                <div class="arrow">
+                    <span class="arrow-text">HTTP Response</span>
+                </div>
+                
+                <!-- Dashboard Visualization -->
+                <div class="flow-step flow-output">
+                    <strong>Dashboard Visualization</strong>
+                    <p>Display energy usage charts, power distribution, and MCB recommendations</p>
+                </div>
+                
+                <div class="arrow arrow-bidirectional">
+                    <span class="arrow-text">User Interaction</span>
+                </div>
+                
+                <!-- User Action -->
+                <div class="flow-step flow-input">
+                    <strong>User Action</strong>
+                    <p>User reviews recommendations and can recalculate or adjust inputs</p>
+                </div>
+            </div>
+        </div>
+        
+        <h2>System Architecture Layers</h2>
+        
+        <div class="architecture-diagram">
+            <div class="arch-layer">
+                <div class="arch-component presentation-layer">User Interface</div>
+                <div class="arch-component presentation-layer">Visualization Components</div>
+                <div class="arch-component presentation-layer">Input Forms</div>
+            </div>
+            
+            <div class="arrow" style="width: 30px; margin: 5px;">
+                <span class="arrow-text" style="font-size: 0.7rem;">API</span>
+            </div>
+            
+            <div class="arch-layer">
+                <div class="arch-component business-layer">Data Processor</div>
+                <div class="arch-component business-layer">Grid Failure Handler</div>
+                <div class="arch-component business-layer">Power Optimizer</div>
+            </div>
+            
+            <div class="arrow" style="width: 30px; margin: 5px;">
+                <span class="arrow-text" style="font-size: 0.7rem;">ML</span>
+            </div>
+            
+            <div class="arch-layer">
+                <div class="arch-component data-layer">Priority Regression Model</div>
+                <div class="arch-component data-layer">Source Classification Model</div>
+                <div class="arch-component data-layer">Energy Dataset</div>
+            </div>
+        </div>
+        
+        <h2>Data Flow Diagram</h2>
+        
+        <div class="diagram">
+            <div class="workflow">
+                <div class="process-container">
+                    <div class="process-column">
+                        <div class="flow-step flow-input">
+                            <strong>User</strong>
+                        </div>
+                        <div class="arrow">
+                            <span class="arrow-text">Input</span>
+                        </div>
+                        <div class="flow-step flow-input">
+                            <strong>React Frontend</strong>
+                            <p>InputDetailsPage<br>ConfigurationPage</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-column">
+                        <div class="flow-step flow-process">
+                            <strong>Flask Backend</strong>
+                            <p>Data Processing<br>AI Model Integration</p>
+                        </div>
+                        <div class="arrow">
+                            <span class="arrow-text">Process</span>
+                        </div>
+                        <div class="flow-step flow-process">
+                            <strong>Grid Failure Handler</strong>
+                            <p>Power Allocation<br>MCB Prioritization</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-column">
+                        <div class="flow-step flow-output">
+                            <strong>Results</strong>
+                            <p>Optimal Source<br>MCB Statuses</p>
+                        </div>
+                        <div class="arrow">
+                            <span class="arrow-text">Display</span>
+                        </div>
+                        <div class="flow-step flow-output">
+                            <strong>Dashboard</strong>
+                            <p>Energy Usage Chart<br>Power Distribution</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
