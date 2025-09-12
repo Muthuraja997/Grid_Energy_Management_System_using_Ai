@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 import sys
 import os
+from priority_manager import PriorityManager
 
 # Add parent directory to path to import grid_failure_handler
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,6 +12,9 @@ from grid_failure_handler import simulate_grid_failure
 
 app = Flask(__name__)
 CORS(app)
+
+# Initialize priority manager
+priority_manager = PriorityManager()
 
 # Define model paths
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -125,6 +129,41 @@ def health_check():
             "status": "error", 
             "message": str(e)
         }), 500
+
+# Priority management endpoints
+@app.route("/priorities", methods=["GET"])
+def get_priorities():
+    """Get current MCB priorities"""
+    try:
+        return jsonify(priority_manager.get_priorities())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/priorities/<mcb_type>/<mcb_name>", methods=["PUT"])
+def update_priority(mcb_type, mcb_name):
+    """Update priority for a specific MCB"""
+    try:
+        data = request.json
+        new_priority = data.get("priority")
+        if new_priority is None:
+            return jsonify({"error": "Priority value not provided"}), 400
+            
+        success = priority_manager.update_priority(mcb_type, mcb_name, new_priority)
+        if success:
+            return jsonify({"message": "Priority updated successfully"})
+        else:
+            return jsonify({"error": "Invalid MCB type or name"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/priorities/reset", methods=["POST"])
+def reset_priorities():
+    """Reset priorities to default values"""
+    try:
+        priority_manager.reset_to_default()
+        return jsonify({"message": "Priorities reset to default values"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

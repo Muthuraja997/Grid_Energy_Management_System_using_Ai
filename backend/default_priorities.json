@@ -1,0 +1,44 @@
+{
+    "metadata": {
+        "source": "AI Analysis",
+        "description": "Priorities determined by AI based on criticality analysis and impact assessment",
+        "last_updated": "2025-09-12",
+        "version": "1.0"
+    },
+    "critical": {
+        "hospital_equipment": {
+            "priority": 1,
+            "ai_reasoning": "Life-critical systems requiring immediate power"
+        },
+        "emergency_systems": {
+            "priority": 2,
+            "ai_reasoning": "Essential for safety and emergency response"
+        },
+        "data_centers": {
+            "priority": 3,
+            "ai_reasoning": "Critical for maintaining operational continuity"
+        },
+        "industrial_machines": {
+            "priority": 4,
+            "ai_reasoning": "Important for production but can handle brief interruptions"
+        }
+    },
+    "non_critical": {
+        "lighting": {
+            "priority": 5,
+            "ai_reasoning": "Can be temporarily reduced without major impact"
+        },
+        "hvac": {
+            "priority": 6,
+            "ai_reasoning": "Can operate at reduced capacity temporarily"
+        },
+        "general_purpose": {
+            "priority": 7,
+            "ai_reasoning": "Non-essential systems with flexible operation"
+        },
+        "auxiliary": {
+            "priority": 8,
+            "ai_reasoning": "Support systems with lowest operational priority"
+        }
+    }
+}

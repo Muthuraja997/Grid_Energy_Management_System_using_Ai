@@ -1,0 +1,115 @@
+.ai-priority-info {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+    border-left: 4px solid #007bff;
+}
+
+.ai-badge {
+    background-color: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+
+.ai-reasoning {
+    font-size: 0.9rem;
+    color: #495057;
+    line-height: 1.4;
+}
+
+.ai-prediction {
+    background-color: #e9ecef;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.prediction-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.prediction-value {
+    background-color: #007bff;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.mcb-group[data-critical="true"] .prediction-value {
+    background-color: #dc3545;
+}
+
+.ai-reasoning p {
+    margin: 0;
+}
+
+.mcb-group {
+    position: relative;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.mcb-group[data-critical="true"] .ai-priority-info {
+    border-left-color: #dc3545;
+}
+
+.mcb-group[data-critical="true"] .ai-badge {
+    background-color: #dc3545;
+}
+
+.mcb-critical-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.critical-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.critical-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.priority-value {
+    margin-left: auto;
+    padding: 4px 8px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.mcb-group[data-critical="true"] .priority-value {
+    background-color: #dc3545;
+}
+
+.mcb-group[data-critical="true"] .mcb-critical-group {
+    background-color: #fff3f3;
+    border-left: 4px solid #dc3545;
+}
+
+.mcb-group[data-critical="false"] .mcb-critical-group {
+    border-left: 4px solid #007bff;
+}
