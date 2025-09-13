@@ -1,0 +1,166 @@
+Error: HTTP error! Status: 400. Make sure the backend server is running.<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend-Backend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Grid Power System - Frontend-Backend Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Backend Connectivity</h2>
+        <button onclick="testBackendConnection()">Test Backend Connection</button>
+        <div id="backend-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Grid Power API</h2>
+        <button onclick="testGridStatus()">Get Grid Status</button>
+        <button onclick="testGridPowerUpdate()">Update Grid Power</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Grid Power Input</h2>
+        <form onsubmit="submitGridPower(event)">
+            <label>Voltage (V): <input type="number" id="voltage" value="230" step="0.1"></label><br><br>
+            <label>Current (A): <input type="number" id="current" value="10" step="0.1"></label><br><br>
+            <button type="submit">Submit Grid Power</button>
+        </form>
+        <div id="form-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('backend-result');
+            resultDiv.innerHTML = 'Testing backend connection...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                if (response.ok) {
+                    const text = await response.text();
+                    resultDiv.innerHTML = `<div class="success"><strong>✅ Backend Connected!</strong><br><pre>${text}</pre></div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Backend response error: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Backend connection failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testGridStatus() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = 'Testing grid status API...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/grid/status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="success"><strong>✅ Grid Status API Works!</strong><br><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ API response error: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ API connection failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testGridPowerUpdate() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = 'Testing grid power update API...';
+            
+            try {
+                const testData = {
+                    voltage: 220,
+                    current: 15
+                };
+                
+                const response = await fetch(`${API_BASE}/api/grid/power`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="success"><strong>✅ Grid Power Update API Works!</strong><br><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    const errorData = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ API response error: ${response.status}<br><pre>${errorData}</pre></div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ API connection failed: ${error.message}</div>`;
+            }
+        }
+
+        async function submitGridPower(event) {
+            event.preventDefault();
+            
+            const resultDiv = document.getElementById('form-result');
+            resultDiv.innerHTML = 'Submitting grid power...';
+            
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const current = parseFloat(document.getElementById('current').value);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/grid/power`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ voltage, current })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const power = voltage * current;
+                    resultDiv.innerHTML = `<div class="success"><strong>✅ Grid Power Submitted Successfully!</strong><br>Power: ${power}W (V: ${voltage}V, I: ${current}A)<br><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                } else {
+                    const errorData = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Submission failed: ${response.status}<br><pre>${errorData}</pre></div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Submission failed: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            console.log('Testing backend connectivity...');
+            testBackendConnection();
+        };
+    </script>
+</body>
+</html>

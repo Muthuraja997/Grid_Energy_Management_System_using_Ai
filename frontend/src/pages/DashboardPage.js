@@ -6,11 +6,23 @@ import '../App.css';
 import EnergyUsageChart from '../components/EnergyUsageChart';
 import PowerDistributionChart from '../components/PowerDistributionChart';
 import HistoryTable from '../components/HistoryTable';
+import GridPowerInput from '../components/GridPowerInput';
 
-function DashboardPage({ state, result, handleSubmit, loading, error }) {
+function DashboardPage({ state, result, handleSubmit, handleGridPowerUpdate, loading, error }) {
   const navigate = useNavigate();
   const [lastUpdateTime, setLastUpdateTime] = useState(null);
   const [timeSinceUpdate, setTimeSinceUpdate] = useState(null);
+  const [gridPowerData, setGridPowerData] = useState(null);
+
+  // Handle grid power updates from GridPowerInput component
+  const onGridPowerUpdate = (powerData) => {
+    setGridPowerData(powerData);
+    
+    // Call the parent handler to update the main application state
+    if (handleGridPowerUpdate) {
+      handleGridPowerUpdate(powerData);
+    }
+  };
   
   // Sample history data - in a real app this would be stored in state and persisted
   const [historyData, setHistoryData] = useState([
@@ -96,6 +108,9 @@ function DashboardPage({ state, result, handleSubmit, loading, error }) {
         </div>
         <div className="nav-item active">3. Dashboard & History</div>
       </div>
+      
+      {/* Grid Power Input Component */}
+      <GridPowerInput onPowerUpdate={onGridPowerUpdate} />
       
       <div className="dashboard-controls">
         <button onClick={handleSubmit} disabled={loading} className="calculate-button">

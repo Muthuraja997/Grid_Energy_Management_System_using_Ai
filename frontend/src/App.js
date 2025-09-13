@@ -164,6 +164,16 @@ function App() {
     }));
   };
 
+  const handleGridPowerUpdate = (powerData) => {
+    setState(prev => ({
+      ...prev,
+      powerSources: prev.powerSources.map(source => 
+        source.id === "Grid_Power" ? { ...source, value: powerData.power } : source // Power already in kW from backend
+      ),
+      Grid_Status: powerData.status // Backend returns status as 0/1
+    }));
+  };
+
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     setLoading(true);
@@ -224,6 +234,7 @@ function App() {
               state={state}
               result={result} 
               handleSubmit={handleSubmit} 
+              handleGridPowerUpdate={handleGridPowerUpdate}
               loading={loading} 
             />} 
           />
